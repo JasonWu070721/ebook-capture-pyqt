@@ -3,9 +3,6 @@ import time
 import numpy as np
 import cv2
 from PIL import ImageGrab
-import pyautogui
-from PIL import ImageGrab
-from screeninfo import get_monitors
 
 
 class Main:
@@ -135,6 +132,30 @@ class Main:
             time.sleep(2)
             process_count = process_count + 1
 
+    def capture_img(self, img, x, y, w, h):
+
+        crop_img = img[y:h, x:w]
+        cv2.imwrite(f'test_crop.png', crop_img)
+
+        return crop_img
+
+    def draw_edge(self, img, upper_x, upper_y, lower_x, lower_y):
+
+        cv2.line(img, (upper_x, upper_y),
+                 (main.img_width - lower_x, upper_y), (0, 0, 0), 2)
+        cv2.line(img, (upper_x, upper_y),
+                 (upper_x, main.img_height - lower_y), (0, 0, 0), 2)
+
+        cv2.line(img, (main.img_width - lower_x, main.img_height - lower_y),
+                 (upper_x, main.img_height - lower_y), (0, 0, 0), 2)
+
+        cv2.line(img, (main.img_width - lower_x, main.img_height - lower_y),
+                 (main.img_width - lower_x, upper_y), (0, 0, 0), 2)
+
+        cv2.imwrite(f'test_line.png', img)
+
+        return img
+
 
 if __name__ == '__main__':
 
@@ -146,22 +167,10 @@ if __name__ == '__main__':
 
     img = main.read_img(img_path)
     upper_x, upper_y, lower_x, lower_y = main.get_4corner_point(img)
+    crop_img = main.capture_img(
+        img, upper_x, upper_y, main.img_width - lower_x,  main.img_height - lower_y)
 
-    # main.img_width = 0
-    # main.img_height = 0
-
-    print("main.img_height:", main.img_height)
-
-    cv2.line(img, (upper_x, upper_y), (main.img_width, upper_y), (0, 0, 0), 3)
-    cv2.line(img, (upper_x, upper_y), (upper_x, main.img_height), (0, 0, 0), 3)
-
-    cv2.line(img, (main.img_width - lower_x, main.img_height - lower_y),
-             (0, main.img_height - lower_y), (0, 0, 0), 3)
-
-    cv2.line(img, (main.img_width - lower_x, main.img_height - lower_y),
-             (main.img_width - lower_x, 0), (0, 0, 0), 3)
-
-    cv2.imwrite(f'test_line.png', img)
+    edge_img = main.draw_edge(img, upper_x, upper_y, lower_x, lower_y)
 
     exit()
 
