@@ -3,6 +3,7 @@ import time
 import numpy as np
 import cv2
 from PIL import ImageGrab
+from screeninfo import get_monitors
 
 
 class Main:
@@ -159,7 +160,7 @@ class Main:
 
 if __name__ == '__main__':
 
-    img_path = "test/1.png"
+    img_path = "dataset/1.png"
 
     main = Main()
 
