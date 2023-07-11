@@ -95,10 +95,18 @@ class Main:
 
         return img_gray
 
-    def capture_windows(self):
-        img_rgb = ImageGrab.grab()
-        img_gray = cv2.cvtColor(np.array(img_rgb), cv2.COLOR_RGB2GRAY)
+    def get_pixel_sum(self, img):
+        img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         pixel_sum = 0
+        for img_arr in img_gray:
+            for value in img_arr:
+                # print(value)
+                pixel_sum = pixel_sum + value
+        return pixel_sum
+
+    def capture_windows(self):
+        img_bgr = ImageGrab.grab()
+        img_rgb = cv2.cvtColor(np.array(img_bgr), cv2.COLOR_RGB2BGR)
 
         x = 0
         y = 0
@@ -106,13 +114,7 @@ class Main:
         w = self.img_width
         h = self.img_height
 
-        crop_img = img_gray[y:y+h, x:x+w]
-
-        for img_arr in crop_img:
-            for value in img_arr:
-                pixel_sum = pixel_sum + value
-
-        print(pixel_sum)
+        crop_img = img_rgb[y:y+h, x:x+w]
 
         return crop_img
 
@@ -159,32 +161,35 @@ class Main:
 
 
 if __name__ == '__main__':
-
-    img_path = "dataset/1.png"
-
     main = Main()
 
     main.get_windows_info()
+    page_count = 1
 
-    img = main.read_img(img_path)
-    upper_x, upper_y, lower_x, lower_y = main.get_4corner_point(img)
-    crop_img = main.capture_img(
-        img, upper_x, upper_y, main.img_width - lower_x,  main.img_height - lower_y)
+    while True:
 
-    edge_img = main.draw_edge(img, upper_x, upper_y, lower_x, lower_y)
+        if keyboard.read_key() == "p":
+            print("Screen capture starting.")
+            old_pixel_sum = 0
+            pixel_sum = 0
 
-    exit()
+            while True:
+                img = main.capture_windows()
+                
+                pixel_sum = main.get_pixel_sum(img)
 
-    if keyboard.read_key() == "p":
-        print("Screen capture starting.")
+                if old_pixel_sum + 25 > pixel_sum  and pixel_sum > old_pixel_sum - 25:
+                    break
 
-        while True:
-            # img = main.capture_windows()
+                old_pixel_sum = pixel_sum
+                cv2.imwrite(f'./book/{page_count}.png', img)
+                page_count = page_count + 1
+                time.sleep(1.5)
+                main.next_page()
+                time.sleep(1)
 
-            break
-            time.sleep(2)
-            main.next_page()
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
             time.sleep(1)
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
