@@ -184,7 +184,7 @@ if __name__ == '__main__':
                 old_pixel_sum = pixel_sum
                 cv2.imwrite(f'./book/{page_count}.png', img)
                 page_count = page_count + 1
-                time.sleep(1.5)
+                time.sleep(2)
                 main.next_page()
                 time.sleep(1)
 
